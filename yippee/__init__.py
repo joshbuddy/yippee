@@ -1,3 +1,4 @@
+# flake8: noqa
 from contextlib import contextmanager
 
 

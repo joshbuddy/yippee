@@ -20,7 +20,7 @@ class Generator:
     def generate(self):
         self.preflight()
         self.install()
-        self.write_requirements()
+        return self.write_requirements()
 
     def preflight(self):
         for group in self.groups.values():
@@ -30,7 +30,7 @@ class Generator:
 
     def install(self):
         for group in self.groups.values():
-            group.install_freeze_requirements()
+            group.install_temp_requirements()
 
     def write_requirements(self):
         common_dependencies = reduce(
@@ -40,6 +40,8 @@ class Generator:
 
         for group in self.groups.values():
             group.write_requirements(common_dependencies)
+
+        return list(map(lambda g: g.requirements_path, self.groups.values()))
 
 
 class GroupGenerator:
@@ -77,18 +79,18 @@ class GroupGenerator:
                 fh.write(req_line)
                 fh.write("\n")
 
-    def install_freeze_requirements(self):
+    def install_temp_requirements(self):
         subprocess.check_call(
             [self.pip_path, "install", "-r", self.temp_requirements_path]
         )
-        out = subprocess.check_output([self.pip_path, "freeze", "--all"])
+        out = subprocess.check_output(
+            [self.pip_path, "freeze", "--all", "--isolated"], env={}
+        )
         with open(self.temp_requirements_path, "wb") as fh:
             fh.write(out)
 
         lines = out.decode().strip().split("\n")
-
         self.dependencies = lines
-        print(lines)
 
     def write_requirements(self, common_dependencies):
         requirements = self.process_requirements(common_dependencies)
