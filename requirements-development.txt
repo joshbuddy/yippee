@@ -12,7 +12,7 @@ mccabe==0.6.1
 pkginfo==1.5.0.1
 pycodestyle==2.4.0
 pyflakes==2.0.0
-Pygments==2.3.1
+Pygments==2.7.4
 readme-renderer==24.0
 requests==2.21.0
 requests-toolbelt==0.8.0
